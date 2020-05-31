@@ -1,0 +1,6 @@
+framework module Pods_stethogram {
+  umbrella header "Pods-stethogram-umbrella.h"
+
+  export *
+  module * { export * }
+}
