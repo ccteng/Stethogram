@@ -183,89 +183,37 @@ public class MainActivity extends AppCompatActivity {
     AcousticEchoCanceler m_canceler;
     Thread m_thread;
 
-    final String SERVER_IP = "192.168.1.109"; //server IP address
-    final int SERVER_PORT = 55000;
-
-
     private void do_loopback() {
         m_thread = new Thread() {
             public void run() {
-                Socket socket = null;
-                OutputStream outputStream = null;
-
-                try {
-                    //here you must put your computer's IP address.
-                    InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
-
-                    Log.d("TCP Client", "C: Connecting...");
-
-                    //create a socket to make the connection with the server
-                    socket = new Socket(serverAddr, SERVER_PORT);
-                    outputStream = socket.getOutputStream();
-                } catch (Exception e) {
-                    Log.d("TCP Client", "S: Connection error ", e);
-                }
-/*
-                AudioManager audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-                if (!audioManager.isBluetoothScoOn()) {
-                    //
-                    Log.i(LOG_TAG,"BlueTooth SCO is off ...");
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toast.makeText(MainActivity.this, "BlueTooth not set ...", Toast.LENGTH_LONG).show();
-                        }
-                    });
-                    //return;
-                }
-
-                //audioManager.setMode(AudioManager.STREAM_MUSIC);
-                //audioManager.setSpeakerphoneOn(false);
-                audioManager.setBluetoothScoOn(true);
-
-                AudioDeviceInfo[] devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
-                AudioDeviceInfo preferredDevice = null;
-                for (AudioDeviceInfo dev : devices) {
-                    if (dev.isSink() && (dev.getType() == TYPE_BLUETOOTH_SCO)) {
-                        Log.i(LOG_TAG, dev.getProductName().toString() + ": " + dev.getType());
-                        preferredDevice = dev;
-                    }
-                }
-
-                //audioManager.startBluetoothSco();
-*/
                 CharSequence name;
                 router = (MediaRouter)getSystemService(Context.MEDIA_ROUTER_SERVICE);
                 routeSelected = router.getSelectedRoute(MediaRouter.ROUTE_TYPE_LIVE_AUDIO);
-                //if (routeSelected.getDeviceType() != MediaRouter.RouteInfo.DEVICE_TYPE_BLUETOOTH) {
-                    // Bluetooth NOT selected
-                    //if (routeBT == null) {
-                        // Find Bluetooth route
-                        for (int i = 0; i < router.getRouteCount(); i++) {
-                            MediaRouter.RouteInfo routeInfo = router.getRouteAt(i);
-                            name = routeInfo.getDescription();
-                            if (name == null)
-                                name = routeInfo.getName();
-                            Log.i(LOG_TAG, name.toString() + ":" + routeInfo.getDeviceType());
 
-                            if (routeInfo.getDeviceType() == MediaRouter.RouteInfo.DEVICE_TYPE_BLUETOOTH)
-                                routeBT = routeInfo;
-                        }
-                    //}
+                for (int i = 0; i < router.getRouteCount(); i++) {
+                    MediaRouter.RouteInfo routeInfo = router.getRouteAt(i);
+                    name = routeInfo.getDescription();
+                    if (name == null)
+                        name = routeInfo.getName();
+                    Log.i(LOG_TAG, name.toString() + ":" + routeInfo.getDeviceType());
 
-                    if (routeBT != null) {
-                        // select Bluetooth route
-                        router.selectRoute(MediaRouter.ROUTE_TYPE_LIVE_AUDIO, routeBT);
+                    if (routeInfo.getDeviceType() == MediaRouter.RouteInfo.DEVICE_TYPE_BLUETOOTH)
+                        routeBT = routeInfo;
+                }
 
-                        // confirm slected route
-                        routeSelected = router.getSelectedRoute(MediaRouter.ROUTE_TYPE_LIVE_AUDIO);
-                        name = routeSelected.getDescription();
-                        if (name == null)
-                            name = routeSelected.getName();
-                        Log.i(LOG_TAG, "Selected:" + name.toString() + ":" + routeSelected.getDeviceType());
+                if (routeBT != null) {
+                    // select Bluetooth route
+                    router.selectRoute(MediaRouter.ROUTE_TYPE_LIVE_AUDIO, routeBT);
 
-                        // exit thread if failed?
-                    }
-                //}
+                    // confirm slected route
+                    routeSelected = router.getSelectedRoute(MediaRouter.ROUTE_TYPE_LIVE_AUDIO);
+                    name = routeSelected.getDescription();
+                    if (name == null)
+                        name = routeSelected.getName();
+                    Log.i(LOG_TAG, "Selected:" + name.toString() + ":" + routeSelected.getDeviceType());
+
+                    // exit thread if failed?
+                }
 
                 // stream audio
                 int buffersize = BUF_SIZE;
@@ -295,13 +243,6 @@ public class MainActivity extends AppCompatActivity {
                             AudioTrack.MODE_STREAM);
 
                     m_track.setPlaybackRate(SAMPLE_RATE);
-
-/*
-                    if (preferredDevice != null) {
-                        //m_track.setPreferredDevice(preferredDevice);
-                        Log.i(LOG_TAG, "Set preferred device " + preferredDevice.getProductName());
-                    }
-*/
                 } catch (Throwable t) {
                     Log.e("Error", "Initializing Audio Record and Play objects Failed "+t.getLocalizedMessage());
                     return;
@@ -316,25 +257,13 @@ public class MainActivity extends AppCompatActivity {
 
                 while (m_isRun) {
                     int bytesRead = m_record.read(buffer, 0, buffer.length);
-
                     Log.i(LOG_TAG,"Audio bytes: " + bytesRead);
 
-                    //m_track.write(buffer, 0, bytesRead);
-                    try {
-                        if (outputStream != null) {
-                            outputStream.write(buffer, 0, bytesRead);
-                            outputStream.flush();
-                        }
-                    } catch (Exception e) {
-                        Log.d(LOG_TAG, "S: Write error ", e);
-                    }
+                    m_track.write(buffer, 0, bytesRead);
 
                     yield();
                 }
 
-                try {
-                    if (socket != null) socket.close();
-                } catch (Exception e) {}
                 m_record.stop();
                 m_track.stop();
 
