@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7EA10D8E823FD7CCAEBC52AE /* Pods_stethogram.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39789BB872650AA57FEF6CB4 /* Pods_stethogram.framework */; };
 		D034843524832B4500312B7A /* InputDeviceTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D034843424832B4500312B7A /* InputDeviceTableViewController.swift */; };
 		D06657D924831EB6007423CD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06657D824831EB6007423CD /* AppDelegate.swift */; };
 		D06657DB24831EB6007423CD /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06657DA24831EB6007423CD /* SceneDelegate.swift */; };
@@ -37,7 +36,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7EA10D8E823FD7CCAEBC52AE /* Pods_stethogram.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
